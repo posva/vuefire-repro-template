@@ -1,5 +1,11 @@
 import { createApp } from 'vue'
-import './style.css'
 import App from './App.vue'
+import { VueFire } from 'vuefire'
+import { firebaseApp } from './firebase'
 
-createApp(App).mount('#app')
+createApp(App)
+  .use(VueFire, {
+    // imported above but could also just be created here
+    firebaseApp,
+  })
+  .mount('#app')

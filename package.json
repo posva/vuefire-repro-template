@@ -6,15 +6,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
+    "emulators": "firebase emulators:start",
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.3.4"
+    "firebase": "^10.1.0",
+    "vue": "^3.3.4",
+    "vuefire": "^3.1.13"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.5",
-    "vue-tsc": "^1.8.5"
+    "firebase-tools": "^12.4.6",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.8",
+    "vue-tsc": "^1.8.8"
   }
 }

@@ -1,30 +1,68 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+<script lang="ts" setup>
+import {
+  doc,
+  increment,
+  serverTimestamp,
+  Timestamp,
+  setDoc,
+  updateDoc,
+  DocumentData,
+} from 'firebase/firestore'
+import { computed } from 'vue'
+import { useFirestore, useDocument } from 'vuefire'
+
+const vuefireVersion = __VUEFIRE_VERSION__
+
+const today = new Date().toISOString().slice(0, 10)
+
+const db = useFirestore()
+// this could just be `doc(db, 'count', props.today)` but that wouldn't react to changes
+const todaysCountDoc = computed(() =>
+  doc(db, 'count', today).withConverter<
+    { when: Timestamp; n: number },
+    DocumentData
+  >({
+    fromFirestore: (snapshot) => {
+      // Here you could do validation with a library like zod
+      return snapshot.data(
+        // this avoids having `null` while the server timestamp is updating
+        { serverTimestamps: 'estimate' }
+      ) as { when: Timestamp; n: number }
+    },
+    toFirestore: (data) => data,
+  })
+)
+
+function incrementCount() {
+  if (count.value) {
+    return updateDoc(todaysCountDoc.value, {
+      // increment is a special value that enables increments
+      n: increment(1),
+      // serverTimestamp is a special value that sets the current time
+      when: serverTimestamp(),
+    })
+  } else {
+    return setDoc(todaysCountDoc.value, {
+      n: 0,
+      when: serverTimestamp(),
+    })
+  }
+}
+
+const count = useDocument(todaysCountDoc)
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
-</template>
+  <h1>VueFire</h1>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+  <main>
+    <button type="button" @click="incrementCount">
+      <template v-if="count">count is {{ count.n }}</template>
+      <template v-else>click to create today's count!</template>
+    </button>
+  </main>
+
+  <footer>
+    <code>vuefire@{{ vuefireVersion }}</code>
+  </footer>
+</template>

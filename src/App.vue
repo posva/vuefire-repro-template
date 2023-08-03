@@ -9,6 +9,7 @@ import {
   DocumentData,
 } from 'firebase/firestore'
 import { computed } from 'vue'
+import ErrorBox from './components/ErrorBox.vue'
 import { useFirestore, useDocument } from 'vuefire'
 
 const vuefireVersion = __VUEFIRE_VERSION__
@@ -49,11 +50,13 @@ function incrementCount() {
   }
 }
 
-const count = useDocument(todaysCountDoc)
+const { data: count, error } = useDocument(todaysCountDoc)
 </script>
 
 <template>
   <h1>VueFire</h1>
+
+  <ErrorBox v-if="error" :error="error" />
 
   <main>
     <button type="button" @click="incrementCount">
